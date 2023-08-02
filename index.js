@@ -4,6 +4,7 @@ const app = express()
 const routes = require("./routes")
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
+const handleCors = require("./middlewares/cors");
 
 require("dotenv").config();
 
@@ -14,6 +15,8 @@ app.use(express.static("Public"));
 app.use(flash())
 app.use(cors())
 app.use(cookieParser());
+app.use(handleCors);
+
 
 
 app.get("/", (req, res) => {
