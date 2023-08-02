@@ -81,7 +81,7 @@ class UserController {
   //micho
   static async updateUser(req, res) {
     const { id } = req.params; // Mendapatkan ID user dari URL parameter
-    const { username, password, email, total_score, biodata, city } = req.body;
+    const { username, password, email, total_score, biodata, city, image } = req.body;
     try {
       // Cek apakah user sama dengan ID yang diberikan ada di database
       const User = await prisma.user.findUnique({
