@@ -6,8 +6,15 @@ const jwt = require("jsonwebtoken")
 class AuthController {
   // labib
   static async createUser(req, res) {
-    const { username, password, email, total_score, biodata, city, image } = req.body;
-    try {
+   if(!req.file) {
+    const err = new Error('image harus di upload');
+    err.errorStatus = 422;
+    throw err;
+   }
+    
+   try {
+      const { username, password, email, total_score, biodata, city } = req.body;
+      const image = req.file.path;
       const hashPw = await bcrypt.hash(password, 12);
       const parsedTotalScore = parseInt(total_score);
       const player = await prisma.user.create({
