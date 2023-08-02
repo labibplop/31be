@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 class UserController {
   // labib
   static async createUser(req, res) {
-    const { username, password, email, total_score, biodata, city } = req.body;
+    const { username, password, email, total_score, biodata, city, image } = req.body;
     try {
       const hashPw = await bcrypt.hash(password, 12);
       const parsedTotalScore = parseInt(total_score);
@@ -17,6 +17,7 @@ class UserController {
           total_score: parsedTotalScore,
           biodata,
           city,
+          image,
         },
       });
       //jika body tidak di isi
@@ -104,6 +105,7 @@ class UserController {
           total_score: total_score ? parseInt(total_score) : User.total_score,
           biodata: biodata || User.biodata,
           city: city || User.city,
+          image: image || User.image,
         },
       });
 

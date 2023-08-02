@@ -7,6 +7,7 @@ CREATE TABLE "user" (
     "total_score" INTEGER NOT NULL,
     "biodata" TEXT NOT NULL,
     "city" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
