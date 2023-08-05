@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 class AuthController {
-  // labib
+  
   static async createUser(req, res) {
     if (!req.file) {
       const err = new Error('image harus di upload');

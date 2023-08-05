@@ -1,6 +1,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
+const cloudinary = require('../utils/cloudinary')
+
 
 class UserController {
   static async getUsers(req, res) {
@@ -39,37 +41,46 @@ class UserController {
 
   //micho
   static async updateUser(req, res) {
-    const { id } = req.params; // Mendapatkan ID user dari URL parameter
-    const { username, password, email, total_score, biodata, city, image } = req.body;
+    const { id } = req.params; // Mendapatkan ID user dari parameter URL
+    const { username, password, email, total_score, biodata, city } = req.body;
+
     try {
-      // Cek apakah user sama dengan ID yang diberikan ada di database
-      const User = await prisma.user.findUnique({
+      // Cek apakah user dengan ID yang diberikan ada di database
+      const user = await prisma.user.findUnique({
         where: { id },
       });
 
-      if (!User) {
+      if (!user) {
         return res.status(404).json({
           result: "Failed",
           message: "User tidak ditemukan",
         });
       }
 
-      // Update data user dengan value baru
+      // Proses unggah gambar baru ke Cloudinary (jika ada)
+      let imageUrl = user.image;
+      if (req.file) {
+       
+        const result = await cloudinary.uploadImage(req.file.path);
+        imageUrl = result.secure_url;
+      }
+
+      // Update data user dengan nilai baru termasuk URL gambar baru dari Cloudinary
       const updatedUser = await prisma.user.update({
         where: { id },
         data: {
-          username: username || User.username,
-          password: password ? await bcrypt.hash(password, 12) : User.password,
-          email: email || User.email,
-          total_score: total_score ? parseInt(total_score) : User.total_score,
-          biodata: biodata || User.biodata,
-          city: city || User.city,
-          image: image || User.image,
+          username: username || user.username,
+          password: password ? await bcrypt.hash(password, 12) : user.password,
+          email: email || user.email,
+          total_score: total_score ? parseInt(total_score) : user.total_score,
+          biodata: biodata || user.biodata,
+          city: city || user.city,
+          image: imageUrl, // Gunakan URL gambar baru dari Cloudinary (atau gunakan nilai asli jika tidak ada unggahan gambar baru)
         },
       });
 
       res.status(200).json({
-        message: `Success update users with id ${id}`,
+        message: `Berhasil memperbarui pengguna dengan ID ${id}`,
         data: updatedUser,
       });
     } catch (error) {
