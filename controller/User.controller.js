@@ -3,47 +3,6 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 
 class UserController {
-  // labib
-  static async createUser(req, res) {
-    const { username, password, email, total_score, biodata, city, image } = req.body;
-    try {
-      const hashPw = await bcrypt.hash(password, 12);
-      const parsedTotalScore = parseInt(total_score);
-      const player = await prisma.user.create({
-        data: {
-          username,
-          password: hashPw,
-          email,
-          total_score: parsedTotalScore,
-          biodata,
-          city,
-          image,
-        },
-      });
-      //jika body tidak di isi
-      if (!email || !username) {
-        return res.status(404).json({
-          result: "Failed",
-          messege: "username atau password harus di isi",
-        });
-      }
-      if (!password) {
-        return res.status(404).json({
-          result: "Failed",
-          messege: "Password harus di isi",
-        });
-      }
-      res.status(200).json({
-        message: "berhasil membuat data user",
-        data: player,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({msg:error.message});
-    }
-  }
-
-  // mas laksman
   static async getUsers(req, res) {
     try {
       const users = await prisma.user.findMany();
