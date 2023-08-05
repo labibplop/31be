@@ -1,20 +1,24 @@
 const { PrismaClient } = require("@prisma/client");
+const { uploadImage } = require("../utils/cloudinary");
+const fs = require("fs");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 
 class AuthController {
   // labib
   static async createUser(req, res) {
-   if(!req.file) {
-    const err = new Error('image harus di upload');
-    err.errorStatus = 422;
-    throw err;
-   }
-    
-   try {
+    if (!req.file) {
+      const err = new Error('image harus di upload');
+      err.errorStatus = 422;
+      throw err;
+    }
+
+    try {
       const { username, password, email, total_score, biodata, city } = req.body;
-      const image = req.file.path;
+      const upload = await uploadImage(req.file.path);
+      await fs.unlinkSync(req.file.path);
+      const imageUrl = upload.url;
       const hashPw = await bcrypt.hash(password, 12);
       const parsedTotalScore = parseInt(total_score);
       const player = await prisma.user.create({
@@ -25,9 +29,10 @@ class AuthController {
           total_score: parsedTotalScore,
           biodata,
           city,
-          image,
+          image: imageUrl,
         },
       });
+
       //jika body tidak di isi
       if (!email || !username) {
         return res.status(404).json({
@@ -41,13 +46,14 @@ class AuthController {
           messege: "Password harus di isi",
         });
       }
+
       res.status(200).json({
         message: "berhasil membuat data user",
         data: player,
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({msg:error.message});
+      res.status(500).json({ msg: error.message });
     }
   }
 
