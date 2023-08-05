@@ -5,15 +5,27 @@ class GameController{
     static async createRoom(req, res){
         try {
             const {name, description, thumbnail_url, game_url, play_count} = req.body;
-
+            const parsedPlayCount = parseInt(play_count);
             const room = await prisma.game.create({
-                data:{name, description, thumbnail_url, game_url, play_count}
-            })
+                data:{
+                    name, 
+                    description, 
+                    thumbnail_url, 
+                    game_url, 
+                    play_count:parsedPlayCount,
+                },
+            });
 
-            if(!room) return res.status(401).json({message:"cannot be empty"})
-            res.status(202).json({message:"succes create room", data: room})
+            if(!room) 
+            return res.status(401).json({
+                message:"cannot be empty"});
+                
+            res.status(202).json({
+                message:"succes create room", 
+                data: room
+            });
         } catch (error) {
-            res.status(500).json({msg: error.message})
+            res.status(500).json({msg: error.message});
         }
     }
 
