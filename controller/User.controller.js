@@ -2,6 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 const cloudinary = require('../utils/cloudinary')
+const fs = require("fs");
 
 
 class UserController {
@@ -62,6 +63,7 @@ class UserController {
       if (req.file) {
        
         const result = await cloudinary.uploadImage(req.file.path);
+        await fs.unlinkSync(req.file.path);
         imageUrl = result.secure_url;
       }
 
